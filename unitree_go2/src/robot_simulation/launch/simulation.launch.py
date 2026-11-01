@@ -45,15 +45,15 @@ def generate_launch_description():
         output='screen',
     )
 
-    # slam= IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(
-    #             get_package_share_directory('go2_config'),
-    #             'launch',
-    #             'slam.launch.py'
-    #         )
-    #     )
-    # )
+    slam= IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('go2_config'),
+                'launch',
+                'slam.launch.py'
+            )
+        )
+    )
 
    
 
@@ -90,20 +90,22 @@ def generate_launch_description():
                     'use_sim_time': True}]
     )
 
-    # autonomy_stack_go2 = IncludeLaunchDescription(
-    #     AnyLaunchDescriptionSource(
-    #         os.path.join(
-    #             get_package_share_directory('robot_simulation'),
-    #             'launch',
-    #             'system_simulation.launch.xml'
-    #         )
-    #     )
-    # )
+    autonomy_stack_go2 = IncludeLaunchDescription(
+        AnyLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('robot_simulation'),
+                'launch',
+                'system_simulation.launch.xml'
+            )
+        )
+    )
 
     ld= LaunchDescription()
-    ld.add_action(gazebo_velodyne)
+    # ld.add_action(gazebo_velodyne)
     ld.add_action(pointcloud_to_laserscan)
-    # ld.add_action(slam)
+    ld.add_action(slam)
+    # ld.add_action(static_transform_node)
     ld.add_action(topic_transform_node)
+    # ld.add_action(autonomy_stack_go2)
     # ld.add_action(trajectory_node)
     return ld

@@ -9,6 +9,15 @@ if docker container inspect "$CONTAINER_NAME" > /dev/null 2>&1; then
       docker rm $CONTAINER_NAME
 fi
 
+PKG_ROOT_DIR=$(dirname "$(dirname "$(readlink -f "$0")")")
+MOUNT_ARGS=""
+
+for path in "$PKG_ROOT_DIR"/src/*; do
+      name=$(basename "$path")
+      MOUNT_ARGS="$MOUNT_ARGS -v $path:/home/user/ros2_ws/src/$name"
+done
+
+
 
 if grep -qi microsoft /proc/version; then # Check if running in WSL
   docker run -it --rm --name $CONTAINER_NAME \
@@ -41,6 +50,7 @@ else # Running in ubuntu environment
       -v $XAUTH:/home/user/.docker.$CONTAINER_NAME.xauth \
       -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
       -v /etc/localtime:/etc/localtime:ro \
+      $MOUNT_ARGS \
       $IMAGE_NAME bash
 fi
 
