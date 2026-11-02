@@ -24,10 +24,10 @@ MOUNT_ARGS="$MOUNT_ARGS -v $PKG_ROOT_DIR/tmp/build:/home/user/catkin_ws/build"
 MOUNT_ARGS="$MOUNT_ARGS -v $PKG_ROOT_DIR/tmp/devel:/home/user/catkin_ws/devel"
 MOUNT_ARGS="$MOUNT_ARGS -v $PKG_ROOT_DIR/tmp/logs:/home/user/catkin_ws/logs"
 
-if grep -qi microsoft /proc/version; then # Check if running in WSL
-  docker run -it --rm --name $CONTAINER_NAME \
+if grep -qi microsoft /proc/version; then # Check if running in WSL --gpus all --rm  \
+  docker run -it --name $CONTAINER_NAME \
      --user user \
-     --gpus all --device=/dev/dxg \
+     --device=/dev/dxg \
     -e DISPLAY=$DISPLAY \
     -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
     -e PULSE_SERVER=$PULSE_SERVER \
@@ -37,7 +37,7 @@ if grep -qi microsoft /proc/version; then # Check if running in WSL
     -v /tmp/.X11-unix:/tmp/.X11-unix \
     -v /usr/lib/wsl:/usr/lib/wsl \
     $IMAGE_NAME bash
-else # Running in ubuntu environment
+else # Running in ubuntu environment       --gpus all -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all \ --rm
   XAUTH="$(dirname "$(readlink -f "$0")")/.docker.$CONTAINER_NAME.xauth"
 
   rm -f "$XAUTH"
@@ -45,9 +45,8 @@ else # Running in ubuntu environment
   xauth nlist "$DISPLAY" | sed -e 's/^..../ffff/' | xauth -f "$XAUTH" nmerge -
   chmod 644 "$XAUTH"
 
-  docker run -it --rm --name $CONTAINER_NAME \
+  docker run -it  --name $CONTAINER_NAME \
       --user user \
-      --gpus all -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=all \
       --privileged --net=host -v /dev:/dev \
       -e XDG_RUNTIME_DIR=/tmp/runtime-user \
       -e DISPLAY=$DISPLAY -e TERM -e QT_X11_NO_MITSHM=1 \
